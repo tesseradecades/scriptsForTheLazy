@@ -95,6 +95,16 @@ def rms(seq)
   return Math.sqrt(seq.inject(0.0) {|sum, x| sum + x*x} / seq.length)
 end
 
+#DISPLAYING X GUESSES
+def getBestGuesses(x, diffArray)
+	guesses = Array.new
+	for i in 0..x
+		minDex = diffArray.index(diffArray.min)
+		guesses << minDex
+		diffArray[minDex] = diffArray.max
+	end
+	return guesses
+end
 
 def main()
 	if ARGV.length > 1
