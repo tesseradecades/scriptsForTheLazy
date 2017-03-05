@@ -1,13 +1,19 @@
+#Commands
+$crackCommands = Array["c", "crack"]
+$encodeCommands = Array["e", "encode"]
+$decodeCommands = Array["d", "decode"]
+
+$command = ARGV[0].downcase
 #IMPLEMENTING THE CAESAR CIPHER
-def codeMessage(c, rot, message)
+def codeMessage(rot, message)
 	newMessage = Array.new
 	message.split.each do |a|
 		word = ''
 		a.split('').each do |x|
 			eString = ''
-			if c == "decode"
+			if $decodeCommands.include? $command or $crackCommands.include? $command
 				word += decode(rot, x)
-			elsif c == "encode"
+			elsif $encodeCommands.include? $command
 				word += encode(rot, x)
 			end
 		end
@@ -37,7 +43,7 @@ def encode(rot, ch)
 end
 
 #CRACKING THE CAESAR CIPHER w/ least square
-def crack(message)
+def crack(message, precision)
 	realFreq = Array[8.1, 1.5, 2.8, 4.3, 13.0, 2.2, 2.0, 6.1, 7.0, 0.15, 0.77, 7.0, 2.4,6.8, 7.5, 1.9, 0.095, 6.0, 6.3, 9.1, 2.8, 0.98, 2.4, 0.15, 2.0, 0.074]
 	#Step 1 Calculate letter frequencies of encrypted message
 	pseudoFreq = calculateLetterFrequencies(message)
@@ -53,8 +59,14 @@ def crack(message)
 	end
 	#Step 5: find the array with the smallest difference
 	rot = diffArray.index(diffArray.min)
-	#puts(diffArray)
-	return codeMessage("decode", rot, message)
+	
+	guessKeys = getBestGuesses(precision, diffArray)
+
+	guesses = Array.new
+	for k in guessKeys
+		guesses << codeMessage(k, message)
+	end
+	return guesses
 end
 
 def calculateLetterFrequencies(message)
@@ -98,7 +110,7 @@ end
 #DISPLAYING X GUESSES
 def getBestGuesses(x, diffArray)
 	guesses = Array.new
-	for i in 0..x
+	for i in 0..(x-1)
 		minDex = diffArray.index(diffArray.min)
 		guesses << minDex
 		diffArray[minDex] = diffArray.max
@@ -107,19 +119,17 @@ def getBestGuesses(x, diffArray)
 end
 
 def main()
-	if ARGV.length > 1
-		command = ARGV[0]
-		if command == "crack"
-			messages = ARGV[1..ARGV.length-1]
+	if ARGV.length > 2
+		if $crackCommands.include? $command
+			messages = ARGV[2..ARGV.length-1]
 			messages.each do |m|
-				puts(crack(m))
+				puts(crack(m, ARGV[1].to_i))
 			end
-			#puts("Cracking Caesar Cipher coming soon!")
-		elsif (command == "encode" or command == "decode") and ARGV.length > 2
+		elsif ($encodeCommands.include? $command or $decodeCommands.include? $command)
 			rot = ARGV[1]
 			mess = ARGV[2..ARGV.length-1]
 			mess.each do |m|
-				puts(codeMessage(command, rot, m))
+				puts(codeMessage(rot, m))
 			end
 		else
 			puts("args don't match the command you entered")
