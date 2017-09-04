@@ -1,10 +1,12 @@
 from copy import deepcopy
 from random import randrange
+import time
 
-a = [5,1,4,2,8]
-#dataFileName = "generatedData.txt"
 outputTimeFileName = "times.txt"
 
+"""
+Sorting algorithms courtesy of geeksforgeeks.org
+"""
 def swap(x,y):
 	z = x
 	x = y
@@ -52,22 +54,7 @@ def countingSort(arr, exp1):
     i = 0
     for i in range(0,len(arr)):
         arr[i] = output[i]
-		
-
-def generateData(m, t):
-	print("Generating data for a magnitude of ", m)
-	l = []
-	mag = 10**m
-	for x in range(0,mag):
-		l.append(randrange(mag))
-	f = open("generatedData.txt", "a+")
-	writeString = "Magnitude: "+str(m)+" \nData: "+str(l)+"\n"
-	f.write(writeString)
-	f.close()
-	print("Finished generating data for a magnitude of ", m)
-	return l
-		
-		
+				
 def insertionSort(arr):
  
     # Traverse through 1 to len(arr)
@@ -193,37 +180,53 @@ def radixSort(arr):
         countingSort(arr,exp)
         exp *= 10
 
+"""END OF SORTING ALGORITHMS"""
 
-def sort(arr, type):
-	if(type == "b"):
-		print("Running Bubble Sort")
+def generateData(m, t):
+	print("Generating data for a magnitude of ", m)
+	l = []
+	mag = 10**m
+	for x in range(0,mag):
+		l.append(randrange(mag))
+	f = open("generatedData.txt", "a+")
+	writeString = "Magnitude: "+str(m)+" \nData: "+str(l)+"\n"
+	f.write(writeString)
+	f.close()
+	print("Finished generating data for a magnitude of ", m)
+	return l
+		
+def sort(arr, type, mag):
+	print("Running "+type+" Sort")
+	start = time.time()
+	if(type == "Bubble"):
+		start = time.time()
 		bubbleSort(arr)
-		print("Bubble Sort finished")
-	elif(type == "i"):
-		print("Running Insertion Sort")
+	elif(type == "Insertion"):
 		insertionSort(arr)
-		print("Insertion Sort finished")
-	elif(type == "m"):
-		print("Running Merge Sort")
+	elif(type == "Merge"):
 		mergeSort(arr, 0, len(arr)-1)
-		print("Merge Sort finished")
-	elif( type == "q"):
-		print("Running Quick Sort")
+	elif( type == "Quick"):
 		quickSort(arr, 0, len(arr)-1)
-		print("Quick Sort finished")
-	elif(type=="r"):
-		print("Running Radix Sort")
+	elif(type=="Radix"):
 		radixSort(arr)
-		print("Radix Sort finished")
+	end = time.time()
+	print(type+" Sort finished")
+	elapsed = (end - start)
+	retString = type+" Sort time "+str(elapsed)+"\n"
+	return retString
 
 
 def driver(maxMag=0, type="i"):
-	for x in range(0, maxMag):
+	for x in range(0, maxMag+1):
 		data = generateData(x, type)
-		sort(deepcopy(data), "b")
-		sort(deepcopy(data), "i")
-		sort(deepcopy(data), "m")
-		sort(deepcopy(data), "q")
-		sort(deepcopy(data), "r")
+		f = open(outputTimeFileName, "a+")
+		writeString = "\n10^"+str(x)+" data\n"
+		writeString+=sort(deepcopy(data), "Bubble",x)
+		writeString+=sort(deepcopy(data), "Insertion",x)
+		writeString+=sort(deepcopy(data), "Merge",x)
+		writeString+=sort(deepcopy(data), "Quick",x)
+		writeString+=sort(deepcopy(data), "Radix",x)
+		f.write(writeString)
+		f.close()
 
 driver(1)
