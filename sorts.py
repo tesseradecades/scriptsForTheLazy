@@ -182,20 +182,81 @@ def radixSort(arr):
 
 """END OF SORTING ALGORITHMS"""
 
-def generateData(m, t):
+def generateDataMaxFirst(m, t):
+	print("Generating data for a magnitude of ", m)
+	l = []
+	mag = 10**m
+	for x in range(0,mag):
+		l.append(randrange(mag))
+	lmax = [max(l)]+l
+	f = open("generatedData.txt", "a+")
+	writeString = "Magnitude: "+str(m)+" \nMax Value First\nData: "+str(lmax)+"\n"
+	f.write(writeString)
+	print(writeString)
+	f.close()
+	print("Finished generating data for a magnitude of ", m)
+	return lmax
+
+def generateDataMaxLast(m, t):
+	print("Generating data for a magnitude of ", m)
+	l = []
+	mag = 10**m
+	for x in range(0,mag):
+		l.append(randrange(mag))
+	lmax = l+[max(l)]
+	f = open("generatedData.txt", "a+")
+	writeString = "Magnitude: "+str(m)+" \nMax Value Last\nData: "+str(lmax)+"\n"
+	f.write(writeString)
+	print(writeString)
+	f.close()
+	print("Finished generating data for a magnitude of ", m)
+	return lmax
+
+def generateDataMinFirst(m, t):
+	print("Generating data for a magnitude of ", m)
+	l = []
+	mag = 10**m
+	for x in range(0,mag):
+		l.append(randrange(mag))
+	lmin = [min(l)]+l
+	f = open("generatedData.txt", "a+")
+	writeString = "Magnitude: "+str(m)+" \nMin Value First\nData: "+str(lmin)+"\n"
+	f.write(writeString)
+	print(writeString)
+	f.close()
+	print("Finished generating data for a magnitude of ", m)
+	return lmin
+	
+def generateDataMinLast(m, t):
+	print("Generating data for a magnitude of ", m)
+	l = []
+	mag = 10**m
+	for x in range(0,mag):
+		l.append(randrange(mag))
+	lmin = l+[min(l)]
+	f = open("generatedData.txt", "a+")
+	writeString = "Magnitude: "+str(m)+" \nMin Value Last\nData: "+str(lmin)+"\n"
+	f.write(writeString)
+	print(writeString)
+	f.close()
+	print("Finished generating data for a magnitude of ", m)
+	return lmin
+
+def generateDataRand(m, t):
 	print("Generating data for a magnitude of ", m)
 	l = []
 	mag = 10**m
 	for x in range(0,mag):
 		l.append(randrange(mag))
 	f = open("generatedData.txt", "a+")
-	writeString = "Magnitude: "+str(m)+" \nData: "+str(l)+"\n"
+	writeString = "Magnitude: "+str(m)+" \nRandomData\nData: "+str(l)+"\n"
 	f.write(writeString)
+	print(writeString)
 	f.close()
 	print("Finished generating data for a magnitude of ", m)
 	return l
-		
-def sort(arr, type, mag):
+	
+def sort(arr, type):
 	print("Running "+type+" Sort")
 	start = time.time()
 	if(type == "Bubble"):
@@ -218,15 +279,40 @@ def sort(arr, type, mag):
 
 def driver(maxMag=0, type="i"):
 	for x in range(0, maxMag+1):
-		data = generateData(x, type)
+		maxFirstData = generateDataMaxFirst(x, type)
+		maxLastData = generateDataMaxLast(x, type)
+		minFirstData = generateDataMinFirst(x, type)
+		minLastData = generateDataMinLast(x, type)
+		randData = generateDataRand(x, type)
+		
 		f = open(outputTimeFileName, "a+")
 		writeString = "\n10^"+str(x)+" data\n"
-		writeString+=sort(deepcopy(data), "Bubble",x)
-		writeString+=sort(deepcopy(data), "Insertion",x)
-		writeString+=sort(deepcopy(data), "Merge",x)
-		writeString+=sort(deepcopy(data), "Quick",x)
-		writeString+=sort(deepcopy(data), "Radix",x)
+		writeString+="Max First\n"+generateWriteString(maxFirstData,x)
+		writeString+="Max Last"+generateWriteString(maxLastData,x)+"\n"
+		writeString+="Min First"+generateWriteString(minFirstData,x)+"\n"
+		writeString+="Min Last"+generateWriteString(minLastData,x)+"\n"
 		f.write(writeString)
+		print(writeString)
 		f.close()
 
-driver(1)
+def generateWriteString(data, mag):
+	writeString=""
+	if(mag < 6):
+		writeString+=sort(deepcopy(data), "Bubble")
+		writeString+=sort(deepcopy(data), "Insertion")
+	writeString+=sort(deepcopy(data), "Merge")
+	writeString+=sort(deepcopy(data), "Quick")
+	writeString+=sort(deepcopy(data), "Radix")
+	return writeString
+		
+#The integer passed determines the maximum order of magnitude that will be tested
+for x in range(0, 11):
+	f = open(outputTimeFileName, "a+")
+	writeString = "\nRun#"+str(x)+"\n"
+	f.write(writeString)
+	print(writeString)
+	f.close()
+	driver(10)
+
+#data = generateData(5, "i")
+#print(sort(deepcopy(data), "Insertion",5))
