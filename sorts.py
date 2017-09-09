@@ -1,17 +1,12 @@
 from copy import deepcopy
-from random import randrange
-import time
+import random, string, time
+
 
 outputTimeFileName = "times.txt"
 
 """
 Sorting algorithms courtesy of geeksforgeeks.org
 """
-def swap(x,y):
-	z = x
-	x = y
-	y = z
-
 def bubbleSort(arr=[]):
 	n = len(arr)
 	for i in range(n):
@@ -166,97 +161,77 @@ def quickSort(arr,low,high):
         quickSort(arr, low, pi-1)
         quickSort(arr, pi+1, high)
 
-# Method to do Radix Sort
+# Method to do Radix Sort(doesn't work for strings)
 def radixSort(arr):
- 
-    # Find the maximum number to know number of digits
-    max1 = max(arr)
- 
-    # Do counting sort for every digit. Note that instead
-    # of passing digit number, exp is passed. exp is 10^i
-    # where i is current digit number
-    exp = 1
-    while max1/exp > 0:
-        countingSort(arr,exp)
-        exp *= 10
+	# Find the maximum number to know number of digits
+	max1 = max(arr)
+	# Do counting sort for every digit. Note that instead
+	# of passing digit number, exp is passed. exp is 10^i
+	# where i is current digit number
+	exp = 1
+	while max1/exp > 0:
+		countingSort(arr,exp)
+		exp *= 10
+
+def swap(x,y):
+	z = x
+	x = y
+	y = z
 
 """END OF SORTING ALGORITHMS"""
+def driver(maxMag=0, type="i"):
+	for x in range(0, maxMag+1):
+		randData = generateData(x, type)
+		maxVal = [max(randData)]
+		minVal = [min(randData)]
+		maxFirst = maxVal+deepcopy(randData)
+		maxLast = deepcopy(randData)+maxVal
+		minFirst = minVal+deepcopy(randData)
+		minLast = deepcopy(randData)+minVal
+		
+		f = open(outputTimeFileName, "a+")
+		writeString = "\n10^"+str(x)+" data\n"
+		writeString+="Random\n"+generateWriteString(randData,x)
+		writeString+="Max First\n"+generateWriteString(maxFirst,x)+"\n"
+		writeString+="Max Last\n"+generateWriteString(maxLast,x)+"\n"
+		writeString+="Min First\n"+generateWriteString(minFirst,x)+"\n"
+		writeString+="Min Last\n"+generateWriteString(minLast,x)+"\n"
+		f.write(writeString)
+		print(writeString)
+		f.close()
 
-def generateDataMaxFirst(m, t):
+def generateData(m, t):
 	print("Generating data for a magnitude of ", m)
 	l = []
 	mag = 10**m
-	for x in range(0,mag):
-		l.append(randrange(mag))
-	lmax = [max(l)]+l
-	f = open("generatedData.txt", "a+")
-	writeString = "Magnitude: "+str(m)+" \nMax Value First\nData: "+str(lmax)+"\n"
-	f.write(writeString)
-	print(writeString)
-	f.close()
-	print("Finished generating data for a magnitude of ", m)
-	return lmax
-
-def generateDataMaxLast(m, t):
-	print("Generating data for a magnitude of ", m)
-	l = []
-	mag = 10**m
-	for x in range(0,mag):
-		l.append(randrange(mag))
-	lmax = l+[max(l)]
-	f = open("generatedData.txt", "a+")
-	writeString = "Magnitude: "+str(m)+" \nMax Value Last\nData: "+str(lmax)+"\n"
-	f.write(writeString)
-	print(writeString)
-	f.close()
-	print("Finished generating data for a magnitude of ", m)
-	return lmax
-
-def generateDataMinFirst(m, t):
-	print("Generating data for a magnitude of ", m)
-	l = []
-	mag = 10**m
-	for x in range(0,mag):
-		l.append(randrange(mag))
-	lmin = [min(l)]+l
-	f = open("generatedData.txt", "a+")
-	writeString = "Magnitude: "+str(m)+" \nMin Value First\nData: "+str(lmin)+"\n"
-	f.write(writeString)
-	print(writeString)
-	f.close()
-	print("Finished generating data for a magnitude of ", m)
-	return lmin
-	
-def generateDataMinLast(m, t):
-	print("Generating data for a magnitude of ", m)
-	l = []
-	mag = 10**m
-	for x in range(0,mag):
-		l.append(randrange(mag))
-	lmin = l+[min(l)]
-	f = open("generatedData.txt", "a+")
-	writeString = "Magnitude: "+str(m)+" \nMin Value Last\nData: "+str(lmin)+"\n"
-	f.write(writeString)
-	print(writeString)
-	f.close()
-	print("Finished generating data for a magnitude of ", m)
-	return lmin
-
-def generateDataRand(m, t):
-	print("Generating data for a magnitude of ", m)
-	l = []
-	mag = 10**m
-	for x in range(0,mag):
-		l.append(randrange(mag))
+	if( t == "i"):
+		for x in range(0,mag):
+			l.append(random.randrange(mag))
+	elif( t == "s"):
+		l.append(randString(random.randrange(10)))
 	f = open("generatedData.txt", "a+")
 	writeString = "Magnitude: "+str(m)+" \nRandomData\nData: "+str(l)+"\n"
 	f.write(writeString)
-	print(writeString)
+	#print(writeString)
 	f.close()
 	print("Finished generating data for a magnitude of ", m)
 	return l
-	
-def sort(arr, type):
+
+def generateWriteString(data, mag):
+	writeString=""
+	if(mag < 6):
+		writeString+=testSorts(deepcopy(data), "Bubble")
+		writeString+=testSorts(deepcopy(data), "Insertion")
+	writeString+=testSorts(deepcopy(data), "Merge")
+	writeString+=testSorts(deepcopy(data), "Quick")
+	if(mag < 7):
+		writeString+=testSorts(deepcopy(data), "Radix")
+	return writeString
+
+def randString(size=10, chars=string.ascii_uppercase + string.digits):
+	return ''.join(random.choice(chars) for x in range(size))
+
+def testSorts(arr, type):
 	print("Running "+type+" Sort")
 	start = time.time()
 	if(type == "Bubble"):
@@ -276,43 +251,8 @@ def sort(arr, type):
 	retString = type+" Sort time "+str(elapsed)+"\n"
 	return retString
 
-
-def driver(maxMag=0, type="i"):
-	for x in range(0, maxMag+1):
-		maxFirstData = generateDataMaxFirst(x, type)
-		maxLastData = generateDataMaxLast(x, type)
-		minFirstData = generateDataMinFirst(x, type)
-		minLastData = generateDataMinLast(x, type)
-		randData = generateDataRand(x, type)
-		
-		f = open(outputTimeFileName, "a+")
-		writeString = "\n10^"+str(x)+" data\n"
-		writeString+="Max First\n"+generateWriteString(maxFirstData,x)
-		writeString+="Max Last"+generateWriteString(maxLastData,x)+"\n"
-		writeString+="Min First"+generateWriteString(minFirstData,x)+"\n"
-		writeString+="Min Last"+generateWriteString(minLastData,x)+"\n"
-		f.write(writeString)
-		print(writeString)
-		f.close()
-
-def generateWriteString(data, mag):
-	writeString=""
-	if(mag < 6):
-		writeString+=sort(deepcopy(data), "Bubble")
-		writeString+=sort(deepcopy(data), "Insertion")
-	writeString+=sort(deepcopy(data), "Merge")
-	writeString+=sort(deepcopy(data), "Quick")
-	writeString+=sort(deepcopy(data), "Radix")
-	return writeString
-		
-#The integer passed determines the maximum order of magnitude that will be tested
-for x in range(0, 11):
-	f = open(outputTimeFileName, "a+")
-	writeString = "\nRun#"+str(x)+"\n"
-	f.write(writeString)
-	print(writeString)
-	f.close()
-	driver(10)
-
-#data = generateData(5, "i")
-#print(sort(deepcopy(data), "Insertion",5))
+"""
+First argument for maximum order of magnitude you want to test, second for the 
+kind of data (i or s)
+"""
+driver(10, "i")
