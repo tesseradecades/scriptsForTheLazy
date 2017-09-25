@@ -8,14 +8,15 @@ def plotRuns(xVals, yVals):
 	plt.show()
 
 def main():
-	maxFib = 30
+	maxFib = 40
 	fibNums = range(0,maxFib+1)
-	runs = 1
+	runs = 10
 	itTimes = [0]*(maxFib+1)
 	itMems = [0]*(maxFib+1)
 	reTimes = [0]*(maxFib+1)
 	reMems = [0]*(maxFib+1)
-	for i in range(0,runs+1):
+	for i in range(1,runs+1):
+		print("Run#"+str(i))
 		for x in fibNums:
 			start = time.time()
 			iterativeFibonacci.fibonacci(x)
