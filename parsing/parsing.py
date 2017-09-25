@@ -38,6 +38,12 @@ def processJSON(fName):
 	f.close()
 	return data
 
+def getAvgMemory(method, arg, iterations):
+	mems = []
+	for x in range(0,iterations):
+		mems+=memory_usage((method, (arg,)))
+	return sum(mems)/len(mems)
+	
 def getMethod(command, xorj):
 	if(command=="process" and xorj=="xml"):
 		return processXML
@@ -55,10 +61,16 @@ def execute(command, fileName, xorj,iterations):
 		trueFname = "xmlData/"+fileName+".xml"
 	elif(xorj=="json"):
 		trueFname = "jsonData/"+fileName+".json"
-	data = method(trueFname)
-	t = timeit.Timer(functools.partial(method, trueFname))
+	if(command=="process"):
+		arg = trueFname
+	else:
+		arg = getMethod("process",xorj)(trueFname)
+	avgMem = getAvgMemory(method,arg,iterations)
+	print("Average ",command," memory:\t",avgMem,"MB\tOver ",iterations," iterations.")
+	t = timeit.Timer(functools.partial(method, arg))
 	avgTime = t.timeit(iterations)/iterations
-	print("Average ",command," time:\t",avgTime,"\tOver ",iterations," iterations.")
+	print("Average ",command," time:\t",avgTime,"seconds\tOver ",iterations," iterations.")
+	
 
 def main():
 	command = sys.argv[1]
